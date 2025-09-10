@@ -21,6 +21,7 @@ const ProductForm: React.FC<Props> = ({ onSaved }) => {
   const [form, setForm] = useState<ProductInput>({ name: "", description: "" });
   const [imageFile, setImageFile] = useState<File|null>(null);
   const [imagePreview, setImagePreview] = useState<string|null>(null);
+  const [imageError, setImageError] = useState<string>("");
   const [, setTick] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -67,6 +68,12 @@ const ProductForm: React.FC<Props> = ({ onSaved }) => {
       setTick((x) => !x);
       return;
     }
+    if (!imageFile) {
+      setImageError("La imagen es obligatoria");
+      return;
+    } else {
+      setImageError("");
+    }
     if (!user) {
       toast.error("Debes iniciar sesión para agregar productos (no autenticado)");
       return;
@@ -86,6 +93,7 @@ const ProductForm: React.FC<Props> = ({ onSaved }) => {
       setForm({ name: "", description: "" });
       setImageFile(null);
       setImagePreview(null);
+      setImageError("");
       validator.current.hideMessages();
       setTick((x) => !x);
       setTimeout(() => {
@@ -133,18 +141,22 @@ const ProductForm: React.FC<Props> = ({ onSaved }) => {
         {validator.current.message("description", form.description, "required|min:10")}
       </div>
       <div className="mb-3">
-        <label htmlFor="image" className="form-label">Imagen</label>
+        <label htmlFor="image" className="form-label">Imagen <span className="text-danger">*</span></label>
         <input
           id="image"
           type="file"
           name="image"
           accept="image/*"
           className="form-control"
-          onChange={handleChange}
+          onChange={e => {
+            handleChange(e);
+            setImageError("");
+          }}
         />
         {imagePreview && (
           <img src={imagePreview} alt="Vista previa" className="img-fluid mt-2" style={{maxHeight: 180}} />
         )}
+        {imageError && <div className="text-danger small mt-1">{imageError}</div>}
       </div>
       <button type="submit" className="btn btn-primary" disabled={saving}>
         {saving ? "Agregando..." : "Guardar producto"}
