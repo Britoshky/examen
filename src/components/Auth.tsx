@@ -13,16 +13,19 @@ export function Auth() {
 	const user = auth.currentUser;
 	const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY as string;
 	const recaptchaTokenRef = useRef<string | null>(null);
-	const [recaptchaReady, setRecaptchaReady] = useState(false);
+	// const [recaptchaReady, setRecaptchaReady] = useState(false);
+	const [recaptchaExecute, setRecaptchaExecute] = useState(false);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setLoading(true);
-		if (!recaptchaTokenRef.current) {
-			toast.error("Por favor, verifica el reCAPTCHA antes de continuar.");
-			setLoading(false);
-			return;
-		}
+		setRecaptchaExecute(true); // Dispara el challenge invisible
+	};
+
+	// Cuando el reCAPTCHA se verifica, continúa con el login/registro
+	const handleRecaptchaVerify = async (token: string) => {
+		recaptchaTokenRef.current = token;
+		// setRecaptchaReady(true); // ya no se usa
 		try {
 			if (isRegister) {
 				await createUserWithEmailAndPassword(auth, email, password);
@@ -36,14 +39,12 @@ export function Auth() {
 		} finally {
 			setLoading(false);
 			recaptchaTokenRef.current = null;
-			setRecaptchaReady(false);
+			// setRecaptchaReady(false); // ya no se usa
+			setRecaptchaExecute(false);
 		}
 	};
 
-	const handleRecaptchaVerify = (token: string) => {
-		recaptchaTokenRef.current = token;
-		setRecaptchaReady(true);
-	};
+
 
 	if (user) {
 		return (
@@ -62,8 +63,8 @@ export function Auth() {
 				<div className="mb-2">
 					<input type="password" className="form-control" placeholder="Contraseña" value={password} onChange={e => setPassword(e.target.value)} required />
 				</div>
-				<Recaptcha sitekey={RECAPTCHA_SITE_KEY} onVerify={handleRecaptchaVerify} />
-				<button className="btn btn-primary w-100 mb-2" type="submit" disabled={loading || !recaptchaReady}>
+				<Recaptcha sitekey={RECAPTCHA_SITE_KEY} onVerify={handleRecaptchaVerify} execute={recaptchaExecute} onExecuted={() => setRecaptchaExecute(false)} />
+				<button className="btn btn-primary w-100 mb-2" type="submit" disabled={loading}>
 					{loading ? "Procesando..." : isRegister ? "Registrarse" : "Entrar"}
 				</button>
 				<button type="button" className="btn btn-link w-100" onClick={() => setIsRegister(x => !x)}>

@@ -4,13 +4,23 @@ import { useEffect, useRef } from "react";
 interface RecaptchaProps {
   sitekey: string;
   onVerify: (token: string) => void;
+  execute?: boolean;
+  onExecuted?: () => void;
 }
 
 
-export default function Recaptcha({ sitekey, onVerify }: RecaptchaProps) {
+export default function Recaptcha({ sitekey, onVerify, execute, onExecuted }: RecaptchaProps) {
   // Generar un id único simple para el div
   const recaptchaIdRef = useRef<string>(`recaptcha-${Math.random().toString(36).substring(2, 10)}`);
   const renderedRef = useRef(false);
+
+  // Permite ejecutar el challenge invisible desde el padre
+  useEffect(() => {
+    if (execute && window.grecaptcha && renderedRef.current) {
+      window.grecaptcha.execute(recaptchaIdRef.current);
+      if (onExecuted) onExecuted();
+    }
+  }, [execute, onExecuted]);
 
   useEffect(() => {
     // Cargar el script de recaptcha solo una vez globalmente
