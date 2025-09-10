@@ -1,47 +1,57 @@
 
-# Sistema de Gestión de Productos (React + Firebase)
 
-Aplicación web profesional para gestión de productos con autenticación, almacenamiento de imágenes y carrito, desarrollada con React, TypeScript, Vite y Firebase (Firestore, Auth, Storage).
+# Examen: Sistema de Gestión de Productos (React + Firebase)
 
-## Características
-- Registro e inicio de sesión de usuarios
-- CRUD de productos (cada usuario solo ve y gestiona sus productos)
-- Subida y visualización de imágenes de productos (privadas por usuario)
-- Carrito de compras local
-- Interfaz moderna y responsiva (Bootstrap)
+Aplicación web profesional y responsiva para la gestión de productos, con autenticación, almacenamiento de imágenes, y carrito sincronizado en tiempo real entre dispositivos, desarrollada con React, TypeScript, Vite y Firebase (Firestore, Auth, Storage).
 
-## Tecnologías principales
+## Características principales
+
+- **Autenticación de usuarios**: Registro e inicio de sesión seguro con Firebase Auth.
+- **Gestión de productos**: Cada usuario puede crear, ver y eliminar sus propios productos.
+- **Subida de imágenes**: Las imágenes de productos se almacenan en Firebase Storage, privadas por usuario.
+- **Carrito sincronizado**: El carrito de compras se guarda y sincroniza en tiempo real en Firestore, reflejando los cambios en todos los dispositivos donde el usuario esté autenticado (web y mobile).
+- **Interfaz moderna y responsiva**: Uso de Bootstrap 5 para una experiencia óptima en desktop, tablet y móvil.
+- **Validaciones**: Formularios con validación en tiempo real usando simple-react-validator.
+- **Notificaciones**: Mensajes claros y amigables con React Toastify.
+
+## Tecnologías utilizadas
+
 - React 19 + TypeScript
 - Vite
-- Firebase Auth, Firestore y Storage
+- Firebase (Auth, Firestore, Storage)
 - Bootstrap 5
 - React Router DOM
 - React Toastify
+- simple-react-validator
 
-## Instalación y uso
+## Estructura del proyecto
+
+- `src/components/` Componentes reutilizables: formularios, listas, carrito, navegación, etc.
+- `src/pages/` Vistas principales: Home, Login, Detalle de producto.
+- `src/hooks/` Hooks personalizados (ej: autenticación).
+- `src/firebase.ts` Configuración de Firebase.
+
+## Instalación y ejecución
+
 1. Clona el repositorio:
    ```bash
-   git clone https://github.com/tu-usuario/tu-repo.git
+   git clone https://github.com/Britoshky/examen.git
    cd tu-repo
    ```
-2. Instala dependencias:
+2. Instala las dependencias:
    ```bash
    npm install
    ```
-3. Configura tu archivo `.env` con las credenciales de Firebase (ver `.env.example`).
+3. Configura el archivo `.env` con tus credenciales de Firebase (ver ejemplo `.env.example`).
 4. Inicia la app en modo desarrollo:
    ```bash
    npm run dev
    ```
 
-## Estructura principal
-- `src/components/` Componentes reutilizables (formularios, listas, carrito, etc.)
-- `src/pages/` Vistas principales (Home, Login, Detalle)
-- `src/services/` Lógica de acceso a datos
-- `src/firebase.ts` Configuración de Firebase
-
 ## Seguridad y reglas de Storage
+
 Las imágenes se almacenan en subcarpetas privadas por usuario. Solo el usuario dueño puede ver, editar o eliminar sus imágenes:
+
 ```plaintext
 service firebase.storage {
   match /b/{bucket}/o {
@@ -53,6 +63,7 @@ service firebase.storage {
 ```
 
 ## Despliegue
+
 Puedes desplegar la app fácilmente en Vercel, Netlify o Firebase Hosting.
 
 ---
