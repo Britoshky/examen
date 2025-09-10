@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { collection, onSnapshot, orderBy, query, doc, deleteDoc, where } from "firebase/firestore";
-import { db } from "../firebase";
+import { db, storage } from "../firebase";
+import { ref as storageRef, deleteObject } from "firebase/storage";
 import useAuthUser from "../hooks/useAuthUser";
 import { toast } from "react-toastify";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -43,6 +44,22 @@ const ProductList: React.FC<ProductListProps> = ({ onAddToCart }) => {
     setDeletingId(id);
     toast.info("Eliminando producto...", { autoClose: 1200, toastId: "deleting-product" });
     try {
+      // Buscar el producto para obtener la imageUrl
+      const prod = products.find((p) => p.id === id);
+      if (prod && prod.imageUrl) {
+        try {
+          // Extraer la ruta relativa de Storage desde la URL
+          const url = new URL(prod.imageUrl);
+          const pathMatch = url.pathname.match(/\/o\/(.+)$/);
+          if (pathMatch && pathMatch[1]) {
+            const path = decodeURIComponent(pathMatch[1]);
+            const imgRef = storageRef(storage, path);
+            await deleteObject(imgRef);
+          }
+        } catch (e) {
+          // Si falla la eliminación de la imagen, continuar con el producto
+        }
+      }
       await deleteDoc(doc(db, "products", id));
       toast.success("Producto eliminado", { autoClose: 2000 });
     } catch {
