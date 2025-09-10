@@ -24,12 +24,12 @@ export default function Recaptcha({ sitekey, onVerify, execute, onExecuted, onEr
   }, [execute, onExecuted]);
 
   useEffect(() => {
-    // Cargar el script de recaptcha solo una vez globalmente
+  // Cargar el script de recaptcha solo una vez globalmente y evitar múltiples renders
     let interval: NodeJS.Timeout | undefined;
     const renderRecaptcha = () => {
       if (
         window.grecaptcha &&
-        !renderedRef.current &&
+    typeof window.grecaptcha.render === "function" && // Validar que render es una función
         document.getElementById(recaptchaIdRef.current)
       ) {
         try {
@@ -44,6 +44,7 @@ export default function Recaptcha({ sitekey, onVerify, execute, onExecuted, onEr
           renderedRef.current = true;
         } catch (e) {
           // Si ya fue renderizado, ignorar
+          console.error("Error rendering Recaptcha:", e); // Log error for debugging
         }
       }
     };
