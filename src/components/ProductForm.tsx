@@ -67,7 +67,6 @@ const ProductForm: React.FC<Props> = ({ onSaved }) => {
       setTick((x) => !x);
       return;
     }
-    console.log("Usuario actual:", user);
     if (!user) {
       toast.error("Debes iniciar sesión para agregar productos (no autenticado)");
       return;
