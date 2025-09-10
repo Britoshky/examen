@@ -72,18 +72,66 @@ const ProductList: React.FC<ProductListProps> = ({ onAddToCart }) => {
   if (loading) return <div className="text-center">Cargando productos...</div>;
   if (products.length === 0) return <div className="alert alert-info">No hay productos.</div>;
 
+  const isSingle = products.length === 1;
+  const isDoubleOrTriple = products.length === 2 || products.length === 3;
   return (
-    <div className="row g-4 mb-3">
+    <div className="row g-4 mb-3 justify-content-center">
       {products.map((p) => (
-        <div key={p.id} className="col-12 col-md-6 col-lg-4">
-          <div className="card h-100 shadow-sm border-0">
+        <div
+          key={p.id}
+          className={isSingle ? "col-12 d-flex align-items-stretch justify-content-center" : "col-12 col-sm-6 col-lg-4 d-flex align-items-stretch justify-content-center"}
+        >
+          <div
+            className="card h-100 shadow-sm border-0 w-100"
+            style={{
+              minWidth: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              maxWidth: isSingle ? '100%' : isDoubleOrTriple ? '1100px' : '900px',
+              width: '100%',
+            }}
+          >
             {p.imageUrl && (
-              <img src={p.imageUrl} alt={p.name} className="card-img-top" style={{height: 180, objectFit: 'cover', borderTopLeftRadius: '0.5rem', borderTopRightRadius: '0.5rem'}} />
+              <img
+                src={p.imageUrl}
+                alt={p.name}
+                className="card-img-top"
+                style={{
+                  height: 220,
+                  objectFit: 'cover',
+                  borderTopLeftRadius: '0.5rem',
+                  borderTopRightRadius: '0.5rem',
+                  width: '100%',
+                  maxHeight: '35vw',
+                }}
+              />
             )}
-            <div className="card-body d-flex flex-column">
-              <h5 className="card-title mb-1 text-primary">{p.name}</h5>
-              <p className="card-text text-muted small flex-grow-1">{p.description}</p>
-              <div className="d-flex gap-2 mt-2">
+            <div className="card-body d-flex flex-column" style={{ minHeight: 0, flex: 1 }}>
+              <h5
+                className="card-title mb-2 text-primary text-truncate"
+                style={{ fontSize: 'clamp(1.1rem, 2vw, 1.4rem)', maxWidth: '100%' }}
+                title={p.name}
+              >
+                {p.name}
+              </h5>
+              <p
+                className="card-text text-muted flex-grow-1"
+                style={{
+                  fontSize: 'clamp(0.95rem, 1.5vw, 1.1rem)',
+                  maxHeight: 80,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  display: '-webkit-box',
+                  WebkitLineClamp: 3,
+                  WebkitBoxOrient: 'vertical',
+                  wordBreak: 'break-word',
+                  whiteSpace: 'pre-line',
+                }}
+                title={p.description}
+              >
+                {p.description}
+              </p>
+              <div className="d-flex gap-2 mt-2 flex-wrap">
                 {onAddToCart && (
                   <button className="btn btn-outline-success btn-sm flex-fill" onClick={() => onAddToCart(p)}>
                     <i className="bi bi-cart-plus me-1"></i>Agregar al carrito

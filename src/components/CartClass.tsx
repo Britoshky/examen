@@ -16,7 +16,6 @@ interface CartClassState {
   total: number;
 }
 
-// Componente de clase con ciclo de vida y renderizado dinámico
 export default class CartClass extends Component<CartClassProps, CartClassState> {
   constructor(props: CartClassProps) {
     super(props);
@@ -41,7 +40,7 @@ export default class CartClass extends Component<CartClassProps, CartClassState>
   render() {
     return (
       <div className="card p-3 mb-3">
-        <h5>Carrito (Clase)</h5>
+        <h5>Carrito</h5>
         <ul className="list-group mb-2">
           {this.props.items.map((item) => (
             <li key={item.id} className="list-group-item d-flex justify-content-between align-items-center">
