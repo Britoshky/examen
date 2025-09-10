@@ -39,7 +39,6 @@ export function Auth() {
 		return (
 			<div className="alert alert-success text-center">
 				Sesión iniciada como <b>{user.email}</b>
-				if (recaptchaTimeoutRef.current) clearTimeout(recaptchaTimeoutRef.current);
 			</div>
 		);
 	}
