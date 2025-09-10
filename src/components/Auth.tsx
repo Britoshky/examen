@@ -1,6 +1,5 @@
 
-import { useState, useRef } from "react";
-import Recaptcha from "./Recaptcha";
+import { useState } from "react";
 import { auth } from "../firebase";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { toast } from "react-toastify";
@@ -11,28 +10,12 @@ export function Auth() {
 	const [isRegister, setIsRegister] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const user = auth.currentUser;
-	const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY as string;
-	const recaptchaTokenRef = useRef<string | null>(null);
-	// const [recaptchaReady, setRecaptchaReady] = useState(false);
-	const [recaptchaExecute, setRecaptchaExecute] = useState(false);
-	const recaptchaTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setLoading(true);
-		setRecaptchaExecute(true); // Dispara el challenge invisible
-		// Si en 12s no responde, mostrar error y desbloquear
-		recaptchaTimeoutRef.current = setTimeout(() => {
-			setLoading(false);
-			setRecaptchaExecute(false);
-			toast.error("No se pudo verificar el reCAPTCHA. Intenta de nuevo.");
-		}, 12000);
-	};
-
-	// Cuando el reCAPTCHA se verifica, continúa con el login/registro
-	const handleRecaptchaVerify = async (token: string) => {
-		if (recaptchaTimeoutRef.current) clearTimeout(recaptchaTimeoutRef.current);
-		recaptchaTokenRef.current = token;
 		try {
 			if (isRegister) {
 				await createUserWithEmailAndPassword(auth, email, password);
@@ -45,10 +28,10 @@ export function Auth() {
 			toast.error(err.message);
 		} finally {
 			setLoading(false);
-			recaptchaTokenRef.current = null;
-			setRecaptchaExecute(false);
 		}
 	};
+
+
 
 
 
@@ -70,18 +53,7 @@ export function Auth() {
 					<div className="mb-2">
 						<input type="password" className="form-control" placeholder="Contraseña" value={password} onChange={e => setPassword(e.target.value)} required />
 					</div>
-					<Recaptcha
-						sitekey={RECAPTCHA_SITE_KEY}
-						onVerify={handleRecaptchaVerify}
-						execute={recaptchaExecute}
-						onExecuted={() => setRecaptchaExecute(false)}
-						onError={() => {
-							if (recaptchaTimeoutRef.current) clearTimeout(recaptchaTimeoutRef.current);
-							setLoading(false);
-							setRecaptchaExecute(false);
-							toast.error("Error en el reCAPTCHA. Intenta de nuevo.");
-						}}
-					/>
+
 					<button className="btn btn-primary w-100 mb-2" type="submit" disabled={loading}>
 						{loading ? "Procesando..." : isRegister ? "Registrarse" : "Entrar"}
 					</button>
