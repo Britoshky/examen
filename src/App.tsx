@@ -15,7 +15,7 @@ import ProductForm from "./components/ProductForm";
 function App() {
   return (
     <div className="container-fluid p-0 min-vh-100 d-flex flex-column" style={{minHeight: '100vh', padding: 0}}>
-      <ToastContainer position="top-center" theme="colored" />
+  <ToastContainer position="bottom-right" theme="colored" />
       <HeaderNav />
           <main className="flex-grow-1 d-flex flex-column align-items-center justify-content-center w-100 h-100" style={{width: '100vw', height: '100vh', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
         <Routes>
