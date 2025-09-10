@@ -1,12 +1,13 @@
-import { collection, onSnapshot, orderBy, query, doc, deleteDoc, where } from "firebase/firestore";
-import { db, storage } from "../firebase";
-import { ref as storageRef, deleteObject } from "firebase/storage";
-import useAuthUser from "../hooks/useAuthUser";
-import { toast } from "react-toastify";
-import "bootstrap/dist/css/bootstrap.min.css";
 
-import type { Timestamp } from "firebase/firestore";
+import { Link } from "react-router-dom";
+
+import { collection, deleteDoc, doc, onSnapshot, orderBy, query, where, type Timestamp } from "firebase/firestore";
 import { useEffect, useState } from "react";
+import useAuthUser from "../hooks/useAuthUser";
+import { db } from "../firebase";
+import { deleteObject, ref as storageRef } from "firebase/storage";
+import { storage } from "../firebase";
+import { toast } from "react-toastify";
 
 export interface ProductItem {
   id: string;
@@ -92,19 +93,21 @@ const ProductList: React.FC<ProductListProps> = ({ onAddToCart }) => {
             }}
           >
             {p.imageUrl && (
-              <img
-                src={p.imageUrl}
-                alt={p.name}
-                className="card-img-top"
-                style={{
-                  height: 220,
-                  objectFit: 'cover',
-                  borderTopLeftRadius: '0.5rem',
-                  borderTopRightRadius: '0.5rem',
-                  width: '100%',
-                  maxHeight: '35vw',
-                }}
-              />
+              <Link to={`/producto/${p.id}`} style={{ textDecoration: 'none' }}>
+                <img
+                  src={p.imageUrl}
+                  alt={p.name}
+                  className="card-img-top"
+                  style={{
+                    height: 220,
+                    objectFit: 'cover',
+                    borderTopLeftRadius: '0.5rem',
+                    borderTopRightRadius: '0.5rem',
+                    width: '100%',
+                    maxHeight: '35vw',
+                  }}
+                />
+              </Link>
             )}
             <div className="card-body d-flex flex-column" style={{ minHeight: 0, flex: 1 }}>
               <h5
@@ -112,7 +115,9 @@ const ProductList: React.FC<ProductListProps> = ({ onAddToCart }) => {
                 style={{ fontSize: 'clamp(1.1rem, 2vw, 1.4rem)', maxWidth: '100%' }}
                 title={p.name}
               >
-                {p.name}
+                <Link to={`/producto/${p.id}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                  {p.name}
+                </Link>
               </h5>
               <p
                 className="card-text text-muted flex-grow-1"
