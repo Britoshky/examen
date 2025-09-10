@@ -5,6 +5,34 @@ import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import type { FirebaseError } from "firebase/app";
 import { db, storage } from "../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
+// Utilidad para comprimir imagen a JPEG antes de subir
+async function compressImage(file: File, maxWidth = 1024, quality = 0.7): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const img = new window.Image();
+    img.onload = () => {
+      const scale = Math.min(1, maxWidth / img.width);
+      const w = Math.floor(img.width * scale);
+      const h = Math.floor(img.height * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return reject(new Error('No canvas context'));
+      ctx.drawImage(img, 0, 0, w, h);
+      canvas.toBlob(
+        (blob) => {
+          if (blob) resolve(blob);
+          else reject(new Error('No blob result'));
+        },
+        'image/jpeg',
+        quality
+      );
+    };
+    img.onerror = reject;
+    img.src = URL.createObjectURL(file);
+  });
+}
 import useAuthUser from "../hooks/useAuthUser";
 import { toast } from "react-toastify";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -84,8 +112,15 @@ const ProductForm: React.FC<Props> = ({ onSaved }) => {
     try {
       let imageUrl = undefined;
       if (imageFile) {
+        // Comprimir imagen antes de subir
+        let fileToUpload: Blob = imageFile;
+        try {
+          fileToUpload = await compressImage(imageFile, 1024, 0.7);
+        } catch (err) {
+          console.warn('No se pudo comprimir la imagen, se sube original.', err);
+        }
         const imgRef = ref(storage, `products/${user.uid}/${Date.now()}_${imageFile.name}`);
-        await uploadBytes(imgRef, imageFile);
+        await uploadBytes(imgRef, fileToUpload);
         imageUrl = await getDownloadURL(imgRef);
       }
       await addDoc(collection(db, "products"), { ...form, imageUrl, createdAt: serverTimestamp(), uid: user.uid });
