@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from "react";
 import { collection, onSnapshot, orderBy, query, doc, deleteDoc, where } from "firebase/firestore";
 import { db, storage } from "../firebase";
 import { ref as storageRef, deleteObject } from "firebase/storage";
@@ -6,12 +5,15 @@ import useAuthUser from "../hooks/useAuthUser";
 import { toast } from "react-toastify";
 import "bootstrap/dist/css/bootstrap.min.css";
 
+import type { Timestamp } from "firebase/firestore";
+import { useEffect, useState } from "react";
+
 export interface ProductItem {
   id: string;
   name: string;
   description: string;
   imageUrl?: string;
-  createdAt?: any;
+  createdAt?: Timestamp;
 }
 
 interface ProductListProps {
@@ -44,11 +46,9 @@ const ProductList: React.FC<ProductListProps> = ({ onAddToCart }) => {
     setDeletingId(id);
     toast.info("Eliminando producto...", { autoClose: 1200, toastId: "deleting-product" });
     try {
-      // Buscar el producto para obtener la imageUrl
-      const prod = products.find((p) => p.id === id);
+  const prod = products.find((p: ProductItem) => p.id === id);
       if (prod && prod.imageUrl) {
         try {
-          // Extraer la ruta relativa de Storage desde la URL
           const url = new URL(prod.imageUrl);
           const pathMatch = url.pathname.match(/\/o\/(.+)$/);
           if (pathMatch && pathMatch[1]) {
@@ -76,7 +76,7 @@ const ProductList: React.FC<ProductListProps> = ({ onAddToCart }) => {
   const isDoubleOrTriple = products.length === 2 || products.length === 3;
   return (
     <div className="row g-4 mb-3 justify-content-center">
-      {products.map((p) => (
+      {products.map((p: ProductItem) => (
         <div
           key={p.id}
           className={isSingle ? "col-12 d-flex align-items-stretch justify-content-center" : "col-12 col-sm-6 col-lg-4 d-flex align-items-stretch justify-content-center"}

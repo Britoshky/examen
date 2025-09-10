@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SimpleReactValidator from "simple-react-validator";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import type { FirebaseError } from "firebase/app";
 import { db, storage } from "../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import useAuthUser from "../hooks/useAuthUser";
@@ -101,8 +102,9 @@ const ProductForm: React.FC<Props> = ({ onSaved }) => {
         navigate("/");
       }, 500); // Breve delay para UX y ver toast
       onSaved?.();
-    } catch (err: any) {
-      const msg = err?.message || "Error al agregar el producto";
+    } catch (err) {
+      const error = err as FirebaseError;
+      const msg = error?.message || "Error al agregar el producto";
       toast.error(msg, { autoClose: 4000 });
       setSaving(false);
     }
