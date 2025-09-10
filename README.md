@@ -36,7 +36,7 @@ Aplicación web profesional y responsiva para la gestión de productos, con aute
 1. Clona el repositorio:
    ```bash
    git clone https://github.com/Britoshky/examen.git
-   cd tu-repo
+   cd examen
    ```
 2. Instala las dependencias:
    ```bash
