@@ -17,7 +17,12 @@ export default function Recaptcha({ sitekey, onVerify, execute, onExecuted, onEr
 
   // Permite ejecutar el challenge invisible desde el padre
   useEffect(() => {
-    if (execute && window.grecaptcha && renderedRef.current) {
+    if (
+      execute &&
+      window.grecaptcha &&
+      typeof window.grecaptcha.execute === "function" &&
+      renderedRef.current
+    ) {
       window.grecaptcha.execute(recaptchaIdRef.current);
       if (onExecuted) onExecuted();
     }
@@ -29,7 +34,8 @@ export default function Recaptcha({ sitekey, onVerify, execute, onExecuted, onEr
     const renderRecaptcha = () => {
       if (
         window.grecaptcha &&
-    typeof window.grecaptcha.render === "function" && // Validar que render es una función
+        typeof window.grecaptcha.render === "function" &&
+        !renderedRef.current &&
         document.getElementById(recaptchaIdRef.current)
       ) {
         try {
@@ -44,7 +50,7 @@ export default function Recaptcha({ sitekey, onVerify, execute, onExecuted, onEr
           renderedRef.current = true;
         } catch (e) {
           // Si ya fue renderizado, ignorar
-          console.error("Error rendering Recaptcha:", e); // Log error for debugging
+          // console.error("Error rendering Recaptcha:", e);
         }
       }
     };
