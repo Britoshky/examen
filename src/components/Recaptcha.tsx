@@ -14,24 +14,29 @@ export default function Recaptcha({ sitekey, onVerify }: RecaptchaProps) {
 
   useEffect(() => {
     // Cargar el script de recaptcha solo una vez globalmente
+    let interval: NodeJS.Timeout | undefined;
     const renderRecaptcha = () => {
       if (
         window.grecaptcha &&
         !renderedRef.current &&
         document.getElementById(recaptchaIdRef.current)
       ) {
-        window.grecaptcha.render(recaptchaIdRef.current, {
-          sitekey: sitekey,
-          size: "invisible",
-          callback: onVerify,
-        });
-        renderedRef.current = true;
+        try {
+          window.grecaptcha.render(recaptchaIdRef.current, {
+            sitekey: sitekey,
+            size: "invisible",
+            callback: onVerify,
+          });
+          renderedRef.current = true;
+        } catch (e) {
+          // Si ya fue renderizado, ignorar
+        }
       }
     };
     if (!document.getElementById("recaptcha-script")) {
       const script = document.createElement("script");
       script.id = "recaptcha-script";
-      script.src = "https://www.google.com/recaptcha/api.js?render=explicit";
+      script.src = "https://www.google.com/recaptcha/api.js";
       script.async = true;
       script.onload = () => {
         renderRecaptcha();
@@ -41,17 +46,17 @@ export default function Recaptcha({ sitekey, onVerify }: RecaptchaProps) {
       renderRecaptcha();
     } else {
       // Si el script está pero grecaptcha aún no está listo, esperar
-      const interval = setInterval(() => {
+      interval = setInterval(() => {
         if (window.grecaptcha) {
           renderRecaptcha();
           clearInterval(interval);
         }
       }, 100);
-      return () => clearInterval(interval);
     }
     // Cleanup: no desmontar el widget, solo marcar como no renderizado si cambia el sitekey
     return () => {
       renderedRef.current = false;
+      if (interval) clearInterval(interval);
     };
   }, [sitekey, onVerify]);
 
