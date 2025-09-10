@@ -13,23 +13,49 @@ export function Auth() {
 
 
 
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		setLoading(true);
-		try {
-			if (isRegister) {
-				await createUserWithEmailAndPassword(auth, email, password);
-				toast.success("Usuario registrado");
-			} else {
-				await signInWithEmailAndPassword(auth, email, password);
-				toast.success("Sesión iniciada");
+		const handleSubmit = async (e: React.FormEvent) => {
+			e.preventDefault();
+			setLoading(true);
+			try {
+				if (isRegister) {
+					await createUserWithEmailAndPassword(auth, email, password);
+					toast.success("Usuario registrado");
+				} else {
+					await signInWithEmailAndPassword(auth, email, password);
+					toast.success("Sesión iniciada");
+				}
+			} catch (err: any) {
+				// Mensajes personalizados para errores comunes de Firebase Auth
+				let msg = "Ocurrió un error. Intenta nuevamente.";
+				if (err.code) {
+					switch (err.code) {
+						case "auth/user-not-found":
+							msg = "El correo no está registrado.";
+							break;
+						case "auth/wrong-password":
+							msg = "Contraseña incorrecta.";
+							break;
+						case "auth/invalid-credential":
+							msg = "Correo o contraseña incorrectos.";
+							break;
+						case "auth/invalid-email":
+							msg = "El correo no es válido.";
+							break;
+						case "auth/email-already-in-use":
+							msg = "El correo ya está registrado.";
+							break;
+						case "auth/weak-password":
+							msg = "La contraseña es muy débil (mínimo 6 caracteres).";
+							break;
+						default:
+							msg = err.message || msg;
+					}
+				}
+				toast.error(msg);
+			} finally {
+				setLoading(false);
 			}
-		} catch (err: any) {
-			toast.error(err.message);
-		} finally {
-			setLoading(false);
-		}
-	};
+		};
 
 	if (user) {
 		return (
