@@ -31,8 +31,8 @@ export function Auth() {
 
 	// Cuando el reCAPTCHA se verifica, continúa con el login/registro
 	const handleRecaptchaVerify = async (token: string) => {
+		if (recaptchaTimeoutRef.current) clearTimeout(recaptchaTimeoutRef.current);
 		recaptchaTokenRef.current = token;
-		// setRecaptchaReady(true); // ya no se usa
 		try {
 			if (isRegister) {
 				await createUserWithEmailAndPassword(auth, email, password);
@@ -46,7 +46,6 @@ export function Auth() {
 		} finally {
 			setLoading(false);
 			recaptchaTokenRef.current = null;
-			// setRecaptchaReady(false); // ya no se usa
 			setRecaptchaExecute(false);
 		}
 	};
@@ -62,36 +61,35 @@ export function Auth() {
 		);
 	}
 
-		return (
-			<form className="card p-3 mb-3" onSubmit={handleSubmit} style={{maxWidth: 400}}>
-				<h5 className="mb-3">{isRegister ? "Registro" : "Iniciar sesión"}</h5>
-				<div className="mb-2">
-					<input type="email" className="form-control" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
-				</div>
-				<div className="mb-2">
-					<input type="password" className="form-control" placeholder="Contraseña" value={password} onChange={e => setPassword(e.target.value)} required />
-				</div>
-				<Recaptcha sitekey={RECAPTCHA_SITE_KEY} onVerify={handleRecaptchaVerify} execute={recaptchaExecute} onExecuted={() => setRecaptchaExecute(false)} />
-<Recaptcha
-	sitekey={RECAPTCHA_SITE_KEY}
-	onVerify={handleRecaptchaVerify}
-	execute={recaptchaExecute}
-	onExecuted={() => setRecaptchaExecute(false)}
-	onError={() => {
-		if (recaptchaTimeoutRef.current) clearTimeout(recaptchaTimeoutRef.current);
-		setLoading(false);
-		setRecaptchaExecute(false);
-		toast.error("Error en el reCAPTCHA. Intenta de nuevo.");
-	}}
-/>
-				<button className="btn btn-primary w-100 mb-2" type="submit" disabled={loading}>
-					{loading ? "Procesando..." : isRegister ? "Registrarse" : "Entrar"}
-				</button>
-				<button type="button" className="btn btn-link w-100" onClick={() => setIsRegister(x => !x)}>
-					{isRegister ? "¿Ya tienes cuenta? Inicia sesión" : "¿No tienes cuenta? Regístrate"}
-				</button>
-			</form>
-		);
+			return (
+				<form className="card p-3 mb-3" onSubmit={handleSubmit} style={{maxWidth: 400}}>
+					<h5 className="mb-3">{isRegister ? "Registro" : "Iniciar sesión"}</h5>
+					<div className="mb-2">
+						<input type="email" className="form-control" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
+					</div>
+					<div className="mb-2">
+						<input type="password" className="form-control" placeholder="Contraseña" value={password} onChange={e => setPassword(e.target.value)} required />
+					</div>
+					<Recaptcha
+						sitekey={RECAPTCHA_SITE_KEY}
+						onVerify={handleRecaptchaVerify}
+						execute={recaptchaExecute}
+						onExecuted={() => setRecaptchaExecute(false)}
+						onError={() => {
+							if (recaptchaTimeoutRef.current) clearTimeout(recaptchaTimeoutRef.current);
+							setLoading(false);
+							setRecaptchaExecute(false);
+							toast.error("Error en el reCAPTCHA. Intenta de nuevo.");
+						}}
+					/>
+					<button className="btn btn-primary w-100 mb-2" type="submit" disabled={loading}>
+						{loading ? "Procesando..." : isRegister ? "Registrarse" : "Entrar"}
+					</button>
+					<button type="button" className="btn btn-link w-100" onClick={() => setIsRegister(x => !x)}>
+						{isRegister ? "¿Ya tienes cuenta? Inicia sesión" : "¿No tienes cuenta? Regístrate"}
+					</button>
+				</form>
+			);
 }
 
 export default Auth;
