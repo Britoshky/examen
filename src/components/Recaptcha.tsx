@@ -6,10 +6,11 @@ interface RecaptchaProps {
   onVerify: (token: string) => void;
   execute?: boolean;
   onExecuted?: () => void;
+  onError?: () => void;
 }
 
 
-export default function Recaptcha({ sitekey, onVerify, execute, onExecuted }: RecaptchaProps) {
+export default function Recaptcha({ sitekey, onVerify, execute, onExecuted, onError }: RecaptchaProps) {
   // Generar un id único simple para el div
   const recaptchaIdRef = useRef<string>(`recaptcha-${Math.random().toString(36).substring(2, 10)}`);
   const renderedRef = useRef(false);
@@ -36,6 +37,9 @@ export default function Recaptcha({ sitekey, onVerify, execute, onExecuted }: Re
             sitekey: sitekey,
             size: "invisible",
             callback: onVerify,
+            'error-callback': () => {
+              if (onError) onError();
+            }
           });
           renderedRef.current = true;
         } catch (e) {

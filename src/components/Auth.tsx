@@ -15,11 +15,18 @@ export function Auth() {
 	const recaptchaTokenRef = useRef<string | null>(null);
 	// const [recaptchaReady, setRecaptchaReady] = useState(false);
 	const [recaptchaExecute, setRecaptchaExecute] = useState(false);
+	const recaptchaTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setLoading(true);
 		setRecaptchaExecute(true); // Dispara el challenge invisible
+		// Si en 12s no responde, mostrar error y desbloquear
+		recaptchaTimeoutRef.current = setTimeout(() => {
+			setLoading(false);
+			setRecaptchaExecute(false);
+			toast.error("No se pudo verificar el reCAPTCHA. Intenta de nuevo.");
+		}, 12000);
 	};
 
 	// Cuando el reCAPTCHA se verifica, continúa con el login/registro
@@ -50,6 +57,7 @@ export function Auth() {
 		return (
 			<div className="alert alert-success text-center">
 				Sesión iniciada como <b>{user.email}</b>
+				if (recaptchaTimeoutRef.current) clearTimeout(recaptchaTimeoutRef.current);
 			</div>
 		);
 	}
@@ -64,6 +72,18 @@ export function Auth() {
 					<input type="password" className="form-control" placeholder="Contraseña" value={password} onChange={e => setPassword(e.target.value)} required />
 				</div>
 				<Recaptcha sitekey={RECAPTCHA_SITE_KEY} onVerify={handleRecaptchaVerify} execute={recaptchaExecute} onExecuted={() => setRecaptchaExecute(false)} />
+<Recaptcha
+	sitekey={RECAPTCHA_SITE_KEY}
+	onVerify={handleRecaptchaVerify}
+	execute={recaptchaExecute}
+	onExecuted={() => setRecaptchaExecute(false)}
+	onError={() => {
+		if (recaptchaTimeoutRef.current) clearTimeout(recaptchaTimeoutRef.current);
+		setLoading(false);
+		setRecaptchaExecute(false);
+		toast.error("Error en el reCAPTCHA. Intenta de nuevo.");
+	}}
+/>
 				<button className="btn btn-primary w-100 mb-2" type="submit" disabled={loading}>
 					{loading ? "Procesando..." : isRegister ? "Registrarse" : "Entrar"}
 				</button>
