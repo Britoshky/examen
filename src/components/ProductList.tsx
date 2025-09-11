@@ -9,6 +9,7 @@ import { deleteObject, ref as storageRef } from "firebase/storage";
 import { storage } from "../firebase";
 import { toast } from "react-toastify";
 
+// Estructura de un producto
 export interface ProductItem {
   id: string;
   name: string;
@@ -17,16 +18,23 @@ export interface ProductItem {
   createdAt?: Timestamp;
 }
 
+// Props del componente
 interface ProductListProps {
   onAddToCart?: (product: ProductItem) => void;
 }
 
+// Componente para listar productos
 const ProductList: React.FC<ProductListProps> = ({ onAddToCart }) => {
+  // Estado de productos, carga y eliminación
   const [products, setProducts] = useState<ProductItem[]>([]);
+  // Estado de carga
   const [loading, setLoading] = useState(true);
+  // Estado de eliminación
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  // Usuario autenticado
   const user = useAuthUser();
 
+  // Cargar productos del usuario en tiempo real
   useEffect(() => {
     if (!user) {
       setProducts([]);
@@ -43,6 +51,7 @@ const ProductList: React.FC<ProductListProps> = ({ onAddToCart }) => {
     return () => unsub();
   }, [user]);
 
+  // Manejar eliminación de producto
   const handleDelete = async (id: string) => {
     setDeletingId(id);
     toast.info("Eliminando producto...", { autoClose: 1200, toastId: "deleting-product" });
@@ -83,11 +92,16 @@ const ProductList: React.FC<ProductListProps> = ({ onAddToCart }) => {
     }
   };
 
+  // Renderizar lista de productos
   if (loading) return <div className="text-center">Cargando productos...</div>;
+  // Manejar estado vacío
   if (products.length === 0) return <div className="alert alert-info">No hay productos.</div>;
 
+  // Ajustar diseño según número de productos
   const isSingle = products.length === 1;
+  // Manejar caso de dos o tres productos
   const isDoubleOrTriple = products.length === 2 || products.length === 3;
+  // Renderizar productos
   return (
     <div className="row g-4 mb-3 justify-content-center">
       {products.map((p: ProductItem) => (

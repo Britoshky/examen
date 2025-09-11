@@ -1,42 +1,49 @@
 import { Component } from "react";
 
-
+// Estructura de un ítem en el carrito
 interface CartItem {
   id: string;
   name: string;
   quantity: number;
 }
 
+// Props y estado del componente
 interface CartClassProps {
   items: CartItem[];
   onRemove?: (id: string) => void;
 }
 
+// Estado del componente
 interface CartClassState {
   total: number;
 }
-
+// Componente de clase para el carrito
 export default class CartClass extends Component<CartClassProps, CartClassState> {
+  // Inicializar estado
   constructor(props: CartClassProps) {
     super(props);
     this.state = { total: 0 };
   }
 
+  // Calcular total al montar y actualizar
   componentDidMount() {
     this.updateTotal();
   }
 
+  // Recalcular total si cambian los items
   componentDidUpdate(prevProps: CartClassProps) {
     if (prevProps.items !== this.props.items) {
       this.updateTotal();
     }
   }
 
+  // Función para actualizar el total de productos
   updateTotal() {
     const total = this.props.items.reduce((acc, item) => acc + item.quantity, 0);
     this.setState({ total });
   }
 
+  // Renderizar el componente
   render() {
     return (
       <div className="card p-3 mb-3">

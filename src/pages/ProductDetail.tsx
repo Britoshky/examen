@@ -6,11 +6,16 @@ import type { ProductItem } from "../components/ProductList";
 import { Timestamp } from "firebase/firestore";
 
 export default function ProductDetail() {
+  // ID del producto desde la URL
   const { id } = useParams<{ id: string }>();
+  // Estado del producto y cargando
   const [product, setProduct] = useState<ProductItem | null>(null);
+  // Estado de carga
   const [loading, setLoading] = useState(true);
+  // Navegación
   const navigate = useNavigate();
 
+  // Cargar producto al montar el componente
   useEffect(() => {
     if (!id) return;
     const fetchProduct = async () => {
@@ -27,7 +32,9 @@ export default function ProductDetail() {
     fetchProduct();
   }, [id]);
 
+  // Efecto para cargar el producto
   if (loading) return <div className="text-center mt-5">Cargando...</div>;
+  // Si no hay producto, mostrar mensaje de error
   if (!product) return <div className="alert alert-danger mt-5">Producto no encontrado</div>;
 
   return (

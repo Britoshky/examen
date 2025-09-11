@@ -3,20 +3,26 @@ import { auth } from "../firebase";
 import { signOut } from "firebase/auth";
 import { Link, useNavigate } from "react-router-dom";
 
+// Componente de navegación superior
 export default function HeaderNav() {
+  // Estado del usuario autenticado
   const [user, setUser] = useState(auth.currentUser);
+  // Navegación
   const navigate = useNavigate();
 
+  // Escuchar cambios en el estado de autenticación
   useEffect(() => {
     const unsub = auth.onAuthStateChanged(u => setUser(u));
     return () => unsub();
   }, []);
 
+  // Manejar cierre de sesión
   const handleLogout = async () => {
     await signOut(auth);
     navigate("/login");
   };
 
+  // Renderizar navegación
   return (
     <nav className="mb-4 navbar navbar-expand navbar-light bg-light rounded justify-content-center">
       <ul className="navbar-nav flex-row gap-3 align-items-center">

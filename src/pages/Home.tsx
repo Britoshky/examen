@@ -7,6 +7,7 @@ import useAuthUser from "../hooks/useAuthUser";
 import { db } from "../firebase";
 import { doc, onSnapshot, setDoc } from "firebase/firestore";
 
+// Estructura de un ítem en el carrito
 interface CartItem {
   id: string;
   name: string;
@@ -14,7 +15,9 @@ interface CartItem {
 }
 
 export default function Home() {
+  // Usuario autenticado
   const user = useAuthUser();
+  // Estado del carrito
   const [cart, setCart] = useState<CartItem[]>([]);
 
   // Sincronizar carrito en tiempo real desde Firestore
@@ -37,7 +40,7 @@ export default function Home() {
     },
     [user]
   );
-
+  // Agregar producto al carrito
   const handleAddToCart = (product: ProductItem) => {
     setCart((prev) => {
       const idx = prev.findIndex((item) => item.id === product.id);
@@ -53,7 +56,7 @@ export default function Home() {
       return updated;
     });
   };
-
+  // Remover producto del carrito
   const handleRemoveFromCart = (id: string) => {
     setCart((prev) => {
       const updated = prev.filter((item) => item.id !== id);

@@ -1,4 +1,3 @@
-// ...existing code...
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -12,6 +11,7 @@ import HeaderNav from "./components/HeaderNav";
 import RequireAuth from "./components/RequireAuth";
 import ProductForm from "./components/ProductForm";
 
+// Componente principal de la aplicación
 function App() {
   return (
     <div className="container-fluid p-0 min-vh-100 d-flex flex-column" style={{minHeight: '100vh', padding: 0}}>
