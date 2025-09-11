@@ -1,7 +1,7 @@
 
 import { Link } from "react-router-dom";
 
-import { collection, deleteDoc, doc, onSnapshot, orderBy, query, where, type Timestamp } from "firebase/firestore";
+import { collection, deleteDoc, doc, onSnapshot, orderBy, query, where, getDocs, updateDoc, type Timestamp } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import useAuthUser from "../hooks/useAuthUser";
 import { db } from "../firebase";
@@ -47,7 +47,7 @@ const ProductList: React.FC<ProductListProps> = ({ onAddToCart }) => {
     setDeletingId(id);
     toast.info("Eliminando producto...", { autoClose: 1200, toastId: "deleting-product" });
     try {
-  const prod = products.find((p: ProductItem) => p.id === id);
+      const prod = products.find((p: ProductItem) => p.id === id);
       if (prod && prod.imageUrl) {
         try {
           const url = new URL(prod.imageUrl);
@@ -62,6 +62,19 @@ const ProductList: React.FC<ProductListProps> = ({ onAddToCart }) => {
         }
       }
       await deleteDoc(doc(db, "products", id));
+
+      // Eliminar el producto de todos los carritos (carts)
+      const cartsSnapshot = await getDocs(collection(db, "carts"));
+      const updatePromises: Promise<any>[] = [];
+      cartsSnapshot.forEach((cartDoc) => {
+        const items = cartDoc.data().items || [];
+        const filtered = items.filter((item: { id: string }) => item.id !== id);
+        if (filtered.length !== items.length) {
+          updatePromises.push(updateDoc(doc(db, "carts", cartDoc.id), { items: filtered }));
+        }
+      });
+      await Promise.all(updatePromises);
+
       toast.success("Producto eliminado", { autoClose: 2000 });
     } catch {
       toast.error("Error al eliminar el producto", { autoClose: 2000 });
